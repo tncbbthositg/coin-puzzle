@@ -1,0 +1,5 @@
+*.FCStd?
+*.gcode
+*.stl
+
+*.sw?
