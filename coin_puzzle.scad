@@ -1,33 +1,60 @@
+/* [Coin Props] */
+// Diameter of US Nickel 21.21 mm
+// Diameter of US Dollar Gold 26.49 mm
+// Thickness of US Nickel 1.95 mm
+// Thickness of US Dollar Gold 2 mm
+
+// diameter of coin
+coin_diameter = 21.21;
+
+// height of coin
+coin_height = 1.95;
+
+/* [Puzzle Options] */
+
+// diameter of screw
+pin_diameter = 4.95;
+
+// diameter of bead
+bead_diameter = 4;        
+
+/* [Render Options] */
+
+// smoother renders slower
+quality = 8; //[2:Draft, 4:Medium, 8:Fine, 16:Ultra Fine]
+
+// horizontal padding to account for nozzle size
+horizontal_padding = .25;
+
+// vertical padding
+vertical_padding = .1;
+
+// show exploded view
+show_explode = 0;  
+
+// build the printable model
+show_print = 1;     
+
+// show the ball mold
+show_ball_mold = 0; 
+
+/* [Hidden] */
+
+// print quality settings
+$fa = 12 / quality;
+$fs = 2 / quality;
+
 // Puzzle box
-$fn=40;
 in=25.4;
-gap=.5;
-
-
-show_explode = 0;   //set to 1 to show the exploded view
-show_print = 1;     //set to 1 to build the printable model
-show_ball_mold = 0; //set to 1 to build the ball mold (hot glue ball)
-
-
-
-Dpin=.195*in;     // Diameter of screw 
-D_ball=4;         // Diameter of ball
-//D_ball=6;
-//D_ball=8;
-
-
-coin_diameter      = 21.21;   // Diameter of US Nickel 21.21 mm
-                       // Diameter of US Dollar Gold 26.49 mm
-coin_thickness = 1.95;  // Thickness of US Nickel 1.95 mm
-                     // Depth of US Dollar Gold 2 mm
+gap = horizontal_padding * 2;;
                      
 // Pad the cutouts a smidgen
-Dcavity = coin_diameter + .5;
-depth_cavity = coin_thickness + .1;
+Dcavity = coin_diameter + gap;
+depth_cavity = coin_height + vertical_padding;
 
 ////////////////////////////////////////////////////////////////////////
 
-H_ball_pocket=D_ball+gap;
+H_ball_pocket=bead_diameter+gap;
 
 padding = 3.5;
 width = Dcavity + 2 * padding;
@@ -42,9 +69,9 @@ Hbottom=H_CB+.1*in; //10
 
 
 angle=60;
-Dtap=Dpin; //.15*in is the tap drill size if you want to tap the plastic;
+Dtap=pin_diameter; //.15*in is the tap drill size if you want to tap the plastic;
 Xhole=12;
-Lslot=Dpin/2+max(D_ball,Dpin)/2+gap;
+Lslot=pin_diameter/2+max(bead_diameter,pin_diameter)/2+gap;
 
 Xcavity=width;
 
@@ -53,16 +80,15 @@ tcavity=Hbottom-depth_cavity;
 wx=50;
 
 
-Wkey=Dpin;
-Lkey=min(Dpin,D_ball);
+Wkey=pin_diameter;
+Lkey=min(pin_diameter,bead_diameter);
 radius=(width-Wkey)/2;
 
 WkeyG=Wkey+2*gap;
-D_ball_hole=D_ball+2*gap;
+bead_diameter_hole=bead_diameter+2*gap;
 
 LkeyG=Lkey+gap;
 Xcoin = (length - Dcavity) / 2 - Lkey - padding;
-
 
 if (show_explode)
 {
@@ -88,10 +114,10 @@ if (show_ball_mold)
 module Ball_mold(explode=0)
 {
     Dnozzle=.4;
-    Wmold=D_ball*3;
-    Hmold=D_ball/2*1.5;
-    hpin=D_ball/2;
-    D_trough=D_ball/2;
+    Wmold=bead_diameter*3;
+    Hmold=bead_diameter/2*1.5;
+    hpin=bead_diameter/2;
+    D_trough=bead_diameter/2;
     g=.2;
     
     translate([Wmold,0,Hmold])
@@ -101,29 +127,29 @@ module Ball_mold(explode=0)
             difference()
             {
                 translate([0,0,Hmold/2]) cube([Wmold,Wmold,Hmold],center=true);
-                sphere(d=D_ball);
+                sphere(d=bead_diameter);
                 rotate_extrude()
                 {
-                    translate([D_ball/2+D_trough/2+Dnozzle,0])circle(d=D_trough);
+                    translate([bead_diameter/2+D_trough/2+Dnozzle,0])circle(d=D_trough);
                 }
                 translate([ Wmold/2*.7, Wmold/2*.7,0])
-                    cylinder(d1=D_ball/2+g,d2=Dnozzle+g,h=hpin+g);
+                    cylinder(d1=bead_diameter/2+g,d2=Dnozzle+g,h=hpin+g);
                 rotate([0,90,0])
-                    translate([0,0,D_ball/2+D_trough/2+Dnozzle])
+                    translate([0,0,bead_diameter/2+D_trough/2+Dnozzle])
                         cylinder(d=D_trough,h=Wmold);
                 rotate([0,-90,0])
-                    translate([0,0,D_ball/2+D_trough/2+Dnozzle])
+                    translate([0,0,bead_diameter/2+D_trough/2+Dnozzle])
                         cylinder(d=D_trough,h=Wmold);
                 rotate([90,0,0])
-                    translate([0,0,D_ball/2+D_trough/2+Dnozzle])
+                    translate([0,0,bead_diameter/2+D_trough/2+Dnozzle])
                         cylinder(d=D_trough,h=Wmold);
                 rotate([-90,0,0])
-                    translate([0,0,D_ball/2+D_trough/2+Dnozzle])
+                    translate([0,0,bead_diameter/2+D_trough/2+Dnozzle])
                         cylinder(d=D_trough,h=Wmold);
             }
             
             translate([-Wmold/2*.7,-Wmold/2*.7,-hpin])
-                cylinder(d2=D_ball/2,d1=Dnozzle,h=hpin);
+                cylinder(d2=bead_diameter/2,d1=Dnozzle,h=hpin);
         }
     }
 }
@@ -168,9 +194,9 @@ module Middle_Part(explode=0)
             hull()
                 {
                 translate([-length/2+Xhole,0,0])
-                    cylinder(d=Dpin,h=Hmiddle*2,center=true);
+                    cylinder(d=pin_diameter,h=Hmiddle*2,center=true);
                 translate([-length/2+Xhole+Lslot,0,0])
-                    cylinder(d=max(D_ball_hole,Dpin),h=Hmiddle*2,center=true);
+                    cylinder(d=max(bead_diameter_hole,pin_diameter),h=Hmiddle*2,center=true);
 
                 }
                 
@@ -200,14 +226,14 @@ module Top_Part(explode=0)
                 
                 
                 translate([-length/2+Xhole,0,0])
-                    cylinder(d=Dpin,h=Htop*2,center=true);
+                    cylinder(d=pin_diameter,h=Htop*2,center=true);
                 
                 hull()
                 {
                     translate([-length/2+Xhole,0,0])
-                        cylinder(d=Dpin,h=H_ball_pocket*2,center=true);
+                        cylinder(d=pin_diameter,h=H_ball_pocket*2,center=true);
                     translate([-length/2+Xhole+Lslot,0,0])
-                        cylinder(d=max(D_ball_hole,Dpin),h=H_ball_pocket*2,center=true);
+                        cylinder(d=max(bead_diameter_hole,pin_diameter),h=H_ball_pocket*2,center=true);
                 }
                 
                 translate([Xcoin,0,0])
