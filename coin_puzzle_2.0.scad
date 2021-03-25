@@ -20,19 +20,22 @@ coin_gap = .25;
 lid_angle = 30;
 
 // diameter of bolt
-pin_diameter = 4.95;
+pin_diameter = 3.81;
+
+// desired minimum total length of pin
+desired_pin_length = 18.5;
 
 // diameter of nut for bolt
-nut_diameter = 9.5;
+nut_diameter = 7.9;
 
 // height of nut
-nut_height = 4.5;
+nut_height = 3.1;
 
 // number of sides on nut
-nut_sides = 8;
+nut_sides = 6;
 
-// minimum thickness of base
-base_thickness = 5.2;
+// minimum thickness of plastic pieces
+minimum_thickness = 3.2;
 
 // what percent of the coin is visible through the puzzle
 coin_preview = .75;
@@ -95,14 +98,22 @@ phi = (1 + sqrt(5)) / 2;
 
 coin_radius = coin_diameter / 2;
 
+coin_cavity_height = coin_height + vertical_padding * 2;
+base_height = max(coin_cavity_height + minimum_thickness, nut_height + minimum_thickness);
+lid_height = max(minimum_thickness + pin_diameter + vertical_padding, minimum_thickness);
+slide_height = max(
+  max(minimum_thickness, pin_diameter + vertical_padding) + lid_height + vertical_padding * 2,
+  desired_pin_length - base_height - vertical_padding
+);
+
 key_width = pin_diameter;
 key_length = pin_diameter;
-key_height = base_thickness;
+key_height = slide_height * .5;
 
 // coin cavity radius required to calculate the box length
 cavity_radius = coin_radius + horizontal_padding + coin_gap;
 
-box_padding = base_thickness / 2;
+box_padding = minimum_thickness / 2;
 box_width = cavity_radius * 2 + box_padding * 2;
 box_radius = (box_width - key_width) / 2;
 box_length = key_length + box_padding + cavity_radius * 2 + box_padding + box_width;
@@ -112,19 +123,14 @@ cavity_displacement = box_length / 2 - cavity_radius - key_length - box_padding;
 pin_cavity_radius = pin_diameter / 2 + horizontal_padding;
 pin_cavity_displacement = (box_length - box_width) / 2;
 
-coin_cavity_height = coin_height + vertical_padding * 2;
-base_height = coin_cavity_height + base_thickness;
-lid_height = max(base_thickness / 2 + pin_diameter, base_thickness);
-slide_height = base_thickness + lid_height + vertical_padding * 2;
-
-total_pin_height = base_height + slide_height + 2 * explode_distance;
+total_pin_height = base_height + slide_height + 2 * explode_distance + vertical_padding;
 echo("Total Pin Height: ", total_pin_height);
 echo("Box Width: ", box_width);
 echo("Box Length: ", box_length);
 
 // debug shapes
 module coin() {
-  coin_vertical_displaacement = base_thickness + vertical_padding;
+  coin_vertical_displaacement = minimum_thickness + vertical_padding;
 
   color("gold") translate([cavity_displacement, 0, coin_vertical_displaacement])
     cylinder(h = coin_height, r = coin_radius);
@@ -186,7 +192,7 @@ module base() {
         cube([key_length, key_width, base_height + key_height]);
     }
 
-    translate([cavity_displacement, 0, base_thickness])
+    translate([cavity_displacement, 0, base_height - coin_cavity_height])
       cylinder(h = coin_cavity_height, r = cavity_radius);
 
     translate([-pin_cavity_displacement, 0, 0]) {
@@ -236,10 +242,10 @@ module lid() {
 
     hull() {
       translate([-pin_cavity_displacement, 0, 0])
-        cylinder(h = pin_diameter, r = pin_cavity_radius);
+        cylinder(h = pin_diameter + vertical_padding, r = pin_cavity_radius);
 
       translate([-pin_cavity_displacement + pin_cavity_radius * 2, 0, 0])
-        cylinder(h = pin_diameter, r = pin_cavity_radius);
+        cylinder(h = pin_diameter + vertical_padding, r = pin_cavity_radius);
     }
 
     translate([cavity_displacement - margin_for_angle, 0, 0])
